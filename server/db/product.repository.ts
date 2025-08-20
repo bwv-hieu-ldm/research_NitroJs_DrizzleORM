@@ -1,5 +1,5 @@
 import { db } from "../db";
-import { products, InsertProduct } from "./schema";
+import { products, InsertProduct, users } from "./schema";
 import { eq } from "drizzle-orm";
 
 export class ProductRepository {
@@ -13,11 +13,18 @@ export class ProductRepository {
   }
 
   async findAll() {
-    return db.select().from(products);
+    return db
+      .select()
+      .from(products)
+      .leftJoin(users, eq(products.userId, users.id));
   }
 
   async findByUserId(userId: number) {
-    return db.select().from(products).where(eq(products.userId, userId));
+    return db
+      .select()
+      .from(products)
+      .leftJoin(users, eq(products.userId, users.id))
+      .where(eq(products.userId, userId));
   }
 
   async update(id: number, product: Partial<InsertProduct>) {
