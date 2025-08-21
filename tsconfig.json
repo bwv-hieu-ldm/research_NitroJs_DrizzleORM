@@ -32,7 +32,9 @@
       "db/*": ["./server/db/*"],
       "services/*": ["./server/services/*"],
       "api/*": ["./server/api/*"],
-      "schema/*": ["./server/schema/*"]
+      "schema/*": ["./server/schema/*"],
+      "middleware/*": ["./server/middleware/*"],
+      "validation/*": ["./server/validation/*"]
     }
   }
 }

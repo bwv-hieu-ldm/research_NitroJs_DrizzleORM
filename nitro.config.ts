@@ -10,5 +10,7 @@ export default defineNitroConfig({
     schema: path.resolve(__dirname, "server", "schema"),
     services: path.resolve(__dirname, "server", "services"),
     api: path.resolve(__dirname, "server", "api"),
+    middleware: path.resolve(__dirname, "server", "middleware"),
+    validation: path.resolve(__dirname, "server", "validation"),
   },
 });
