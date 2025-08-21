@@ -1,5 +1,5 @@
+import { InsertUser, users } from "../schema/user";
 import { db } from "../db";
-import { users, InsertUser } from "./schema";
 import { eq } from "drizzle-orm";
 
 export class UserRepository {

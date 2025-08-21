@@ -1,5 +1,5 @@
 import { defineEventHandler, getQuery } from "h3";
-import { ProductService } from "../../db/product.service";
+import { ProductService } from "../../services/product.service";
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);

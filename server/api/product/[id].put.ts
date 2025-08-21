@@ -1,5 +1,5 @@
 import { defineEventHandler, getRouterParam, readBody } from "h3";
-import { ProductService } from "../../db/product.service";
+import { ProductService } from "../../services/product.service";
 
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, "id");

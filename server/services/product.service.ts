@@ -1,5 +1,5 @@
-import { ProductRepository } from "./product.repository";
-import { InsertProduct } from "./schema";
+import { ProductRepository } from "db/product.repository";
+import { InsertProduct } from "schema/product";
 
 const productRepo = new ProductRepository();
 

@@ -1,6 +1,7 @@
 import { db } from "../db";
-import { products, InsertProduct, users } from "./schema";
+import { products, InsertProduct } from "../schema/product";
 import { eq } from "drizzle-orm";
+import { users } from "../schema/user";
 
 export class ProductRepository {
   async create(product: InsertProduct) {
