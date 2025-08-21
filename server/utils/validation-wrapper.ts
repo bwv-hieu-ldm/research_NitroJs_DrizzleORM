@@ -13,7 +13,6 @@ export function withValidation(
     try {
       const validatedData: any = {};
 
-      // Validate body if schema provided
       if (validationSchemas.body) {
         const { readBody } = await import("h3");
         const body = await readBody(event);
@@ -22,7 +21,6 @@ export function withValidation(
         });
       }
 
-      // Validate params if schema provided
       if (validationSchemas.params) {
         const { getRouterParam } = await import("h3");
         const id = getRouterParam(event, "id");
@@ -32,7 +30,6 @@ export function withValidation(
         });
       }
 
-      // Validate query if schema provided
       if (validationSchemas.query) {
         const { getQuery } = await import("h3");
         const query = getQuery(event);

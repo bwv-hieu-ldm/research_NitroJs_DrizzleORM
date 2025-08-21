@@ -23,7 +23,6 @@ export const products = mysqlTable("products", {
     .notNull(),
 });
 
-// Infer types for easier use
 
 export type InsertProduct = typeof products.$inferInsert;
 export type SelectProduct = typeof products.$inferSelect;
