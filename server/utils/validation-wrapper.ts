@@ -1,17 +1,31 @@
-import { defineEventHandler, createError } from "h3";
+import { defineEventHandler, createError, H3Event } from "h3";
 import * as yup from "yup";
+import { HTTP_STATUS, ERROR_MESSAGES } from "../common/constants";
 
-export function withValidation(
-  validationSchemas: {
-    body?: yup.ObjectSchema<any>;
-    params?: yup.ObjectSchema<any>;
-    query?: yup.ObjectSchema<any>;
-  },
-  handler: (event: any, validatedData?: any) => Promise<any>
+interface ValidationSchemas {
+  body?: yup.ObjectSchema<any>;
+  params?: yup.ObjectSchema<any>;
+  query?: yup.ObjectSchema<any>;
+}
+
+interface ValidatedData {
+  body?: any;
+  params?: any;
+  query?: any;
+}
+
+type ValidationHandler<T = any> = (
+  event: H3Event,
+  validatedData: ValidatedData
+) => Promise<T>;
+
+export function withValidation<T = any>(
+  validationSchemas: ValidationSchemas,
+  handler: ValidationHandler<T>
 ) {
-  return defineEventHandler(async (event) => {
+  return defineEventHandler(async (event: H3Event) => {
     try {
-      const validatedData: any = {};
+      const validatedData: ValidatedData = {};
 
       if (validationSchemas.body) {
         const { readBody } = await import("h3");
@@ -47,10 +61,10 @@ export function withValidation(
     } catch (error) {
       if (error instanceof yup.ValidationError) {
         throw createError({
-          statusCode: 400,
+          statusCode: HTTP_STATUS.BAD_REQUEST,
           statusMessage: "Validation Error",
           data: {
-            message: "Invalid request data",
+            message: ERROR_MESSAGES.VALIDATION_ERROR,
             errors: error.errors,
           },
         });

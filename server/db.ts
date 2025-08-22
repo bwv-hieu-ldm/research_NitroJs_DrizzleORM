@@ -1,11 +1,21 @@
-import { drizzle } from "drizzle-orm/mysql2";
-import mysql from "mysql2/promise";
+import { dbConnection } from "./db/connection";
 
-const poolConnection = mysql.createPool({
-  host: process.env.MYSQL_HOST,
-  user: process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD,
-  database: process.env.MYSQL_DATABASE,
-});
+// Export the database instance getter
+export const getDb = () => dbConnection.getDb();
 
-export const db = drizzle(poolConnection);
+// Export the connection manager for advanced usage
+export { dbConnection };
+
+// Initialize function that can be called when the server starts
+export const initializeDatabase = async () => {
+  await dbConnection.initialize();
+};
+
+// For backward compatibility, export a db instance that will be available after initialization
+export let db: ReturnType<typeof getDb>;
+
+// Set up the db instance after initialization
+export const setupDatabase = async () => {
+  await initializeDatabase();
+  db = getDb();
+};
