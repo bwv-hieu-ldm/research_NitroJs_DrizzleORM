@@ -1,4 +1,4 @@
-import { UserRepository } from "../db/user.repository";
+import { UserRepository } from "../repo/user.repository";
 import { SelectUser } from "../schema/user";
 import { UserRole } from "../common/enums";
 import { createError } from "h3";

@@ -1,4 +1,4 @@
-export * from "./base.repository";
-export * from "./product.repository";
-export * from "./user.repository";
+export * from "../repo/base.repository";
+export * from "../repo/product.repository";
+export * from "../repo/user.repository";
 export * from "./connection";

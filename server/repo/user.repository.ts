@@ -1,7 +1,7 @@
-import { InsertUser, users, SelectUser } from "../schema/user";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { createError, H3Error } from "h3";
 import { CONFLICT_ERROR, NOT_FOUND_ERROR } from "../common/error";
+import { InsertUser, SelectUser, users } from "../schema/user";
 import { BaseRepository } from "./base.repository";
 
 export class UserRepository extends BaseRepository {

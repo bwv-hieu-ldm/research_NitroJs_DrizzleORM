@@ -1,5 +1,5 @@
 import { createError, H3Error } from "h3";
-import { DatabaseContext } from "./context";
+import { DatabaseContext } from "../db/context";
 
 export abstract class BaseRepository {
   protected db: ReturnType<typeof DatabaseContext.prototype.getDb>;
