@@ -1,6 +1,6 @@
 import { createError, defineEventHandler, readBody } from "h3";
 import { AuthService } from "../../services/auth.service";
-import { object, string } from "yup";
+import { object, string, ValidationError } from "yup";
 import { UserRole, getAllUserRoles } from "../../common/enums";
 
 const registerSchema = object({
@@ -23,8 +23,8 @@ export default defineEventHandler(async (event) => {
       success: true,
       data: result,
     };
-  } catch (error: any) {
-    if (error.name === "ValidationError") {
+  } catch (error: unknown) {
+    if (error instanceof ValidationError) {
       throw createError({
         statusCode: 400,
         statusMessage: "Validation error",

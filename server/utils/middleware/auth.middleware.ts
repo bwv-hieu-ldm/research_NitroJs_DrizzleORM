@@ -29,10 +29,10 @@ export async function authenticateUser(
   }
 }
 
-export function requireAuth(
-  handler: (event: H3Event, user: AuthenticatedUser) => Promise<any>
+export function requireAuth<T = unknown>(
+  handler: (event: H3Event, user: AuthenticatedUser) => Promise<T>
 ) {
-  return async (event: H3Event) => {
+  return async (event: H3Event): Promise<T> => {
     const user = await authenticateUser(event);
     return handler(event, user);
   };

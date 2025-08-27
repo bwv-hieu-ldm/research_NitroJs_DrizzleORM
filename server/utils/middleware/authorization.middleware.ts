@@ -2,11 +2,9 @@ import { createError, getRouterParam, H3Event } from "h3";
 import { UserRole } from "../../common/enums";
 import { AuthenticatedUser } from "./auth.middleware";
 
-export function requireRole(allowedRoles: UserRole[]) {
-  return (
-    handler: (event: H3Event, user: AuthenticatedUser) => Promise<any>
-  ) => {
-    return async (event: H3Event, user: AuthenticatedUser) => {
+export function requireRole<T = unknown>(allowedRoles: UserRole[]) {
+  return (handler: (event: H3Event, user: AuthenticatedUser) => Promise<T>) => {
+    return async (event: H3Event, user: AuthenticatedUser): Promise<T> => {
       if (!allowedRoles.includes(user.role as UserRole)) {
         throw createError({
           statusCode: 403,
@@ -18,27 +16,27 @@ export function requireRole(allowedRoles: UserRole[]) {
   };
 }
 
-export function requireAdmin(
-  handler: (event: H3Event, user: AuthenticatedUser) => Promise<any>
+export function requireAdmin<T = unknown>(
+  handler: (event: H3Event, user: AuthenticatedUser) => Promise<T>
 ) {
-  return requireRole([UserRole.ADMIN])(handler);
+  return requireRole<T>([UserRole.ADMIN])(handler);
 }
 
-export function requireModerator(
-  handler: (event: H3Event, user: AuthenticatedUser) => Promise<any>
+export function requireModerator<T = unknown>(
+  handler: (event: H3Event, user: AuthenticatedUser) => Promise<T>
 ) {
-  return requireRole([UserRole.ADMIN, UserRole.MODERATOR])(handler);
+  return requireRole<T>([UserRole.ADMIN, UserRole.MODERATOR])(handler);
 }
 
-export function requireUser(
-  handler: (event: H3Event, user: AuthenticatedUser) => Promise<any>
+export function requireUser<T = unknown>(
+  handler: (event: H3Event, user: AuthenticatedUser) => Promise<T>
 ) {
-  return requireRole([UserRole.ADMIN, UserRole.MODERATOR, UserRole.USER])(
+  return requireRole<T>([UserRole.ADMIN, UserRole.MODERATOR, UserRole.USER])(
     handler
   );
 }
 
-export function requireOwnership<T>(
+export function requireOwnership<T, R = unknown>(
   resourceGetter: (id: number) => Promise<T | null>,
   resourceUserIdField: keyof T
 ) {
@@ -47,9 +45,9 @@ export function requireOwnership<T>(
       event: H3Event,
       user: AuthenticatedUser,
       resource: T
-    ) => Promise<any>
+    ) => Promise<R>
   ) => {
-    return async (event: H3Event, user: AuthenticatedUser) => {
+    return async (event: H3Event, user: AuthenticatedUser): Promise<R> => {
       const id = getRouterParam(event, "id");
       if (!id) {
         throw createError({

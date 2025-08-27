@@ -85,7 +85,7 @@ export class ProductRepository extends BaseRepository {
             updatedAt: users.updatedAt,
           },
         })
-        .from(products)
+        .from(products) 
         .leftJoin(users, eq(products.userId, users.id));
 
       return results.map((result) => ({
