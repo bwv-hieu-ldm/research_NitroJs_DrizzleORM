@@ -1,8 +1,8 @@
 import { UserRepository } from "../db/user.repository";
 import { SelectUser, UserRole } from "../schema/user";
 import { createError } from "h3";
-import * as bcrypt from "bcrypt";
-import * as jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 export interface LoginCredentials {
   email: string;
