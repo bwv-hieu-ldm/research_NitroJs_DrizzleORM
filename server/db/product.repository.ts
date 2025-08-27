@@ -139,8 +139,16 @@ export class ProductRepository extends BaseRepository {
   }
 
   async update(id: number, product: Partial<InsertProduct>): Promise<void> {
+    const { createdAt, updatedAt, id: productId, ...updateData } = product;
+
     return this.executeQuery(async () => {
-      await this.db.update(products).set(product).where(eq(products.id, id));
+      await this.db
+        .update(products)
+        .set({
+          ...updateData,
+          updatedAt: new Date(),
+        })
+        .where(eq(products.id, id));
     }, "update product");
   }
 

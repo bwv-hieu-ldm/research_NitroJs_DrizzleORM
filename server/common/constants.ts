@@ -26,4 +26,6 @@ export const ERROR_MESSAGES = {
   DB_NOT_INITIALIZED: "Database not initialized",
   VALIDATION_ERROR: "Validation Error",
   INTERNAL_SERVER_ERROR: "Internal Server Error",
+  USER_ALREADY_EXISTS: "User already exists",
+  UNKNOWN_ERROR: "Unknown error",
 } as const;

@@ -8,7 +8,6 @@ export const commonFields = {
     .notNull(),
   updatedAt: timestamp("updated_at")
     .default(sql`CURRENT_TIMESTAMP`)
-    .$onUpdate(() => sql`CURRENT_TIMESTAMP`)
     .notNull(),
 } as const;
 

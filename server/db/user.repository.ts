@@ -81,8 +81,16 @@ export class UserRepository extends BaseRepository {
       }
     }
 
+    const { createdAt, updatedAt, id: userId, ...updateData } = user;
+
     return this.executeQuery(async () => {
-      await this.db.update(users).set(user).where(eq(users.id, id));
+      await this.db
+        .update(users)
+        .set({
+          ...updateData,
+          updatedAt: new Date(),
+        })
+        .where(eq(users.id, id));
     }, "update user");
   }
 
