@@ -16,7 +16,6 @@ export default defineEventHandler(
       try {
         const body = await readBody(event);
 
-        // Validate input
         const validatedData = await createProductSchema.validate(body);
 
         const result = await ProductService.create({

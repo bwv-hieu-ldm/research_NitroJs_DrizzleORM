@@ -15,7 +15,7 @@ export async function authenticateUser(
     });
   }
 
-  const token = authHeader.substring(7); // Remove "Bearer " prefix
+  const token = authHeader.substring(7);
   const authService = new AuthService();
 
   try {

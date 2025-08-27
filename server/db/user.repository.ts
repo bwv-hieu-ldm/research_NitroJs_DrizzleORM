@@ -17,7 +17,6 @@ export class UserRepository extends BaseRepository {
       if (foundUser.length) throw CONFLICT_ERROR("User already exists");
 
       const [result] = await this.db.insert(users).values(user);
-      // Fetch the created user to return the full object
       const [createdUser] = await this.db
         .select()
         .from(users)
@@ -65,11 +64,9 @@ export class UserRepository extends BaseRepository {
   }
 
   async update(id: number, user: Partial<InsertUser>): Promise<void> {
-    // Check if user exists
     const foundUser = await this.findById(id);
     if (!foundUser) throw NOT_FOUND_ERROR("User not found");
 
-    // Check for email conflict only if email is being updated
     if (user.email && user.email !== foundUser.email) {
       const existingUserWithEmail = await this.executeQuery(async () => {
         return this.db
@@ -84,7 +81,6 @@ export class UserRepository extends BaseRepository {
       }
     }
 
-    // Perform update
     return this.executeQuery(async () => {
       await this.db.update(users).set(user).where(eq(users.id, id));
     }, "update user");

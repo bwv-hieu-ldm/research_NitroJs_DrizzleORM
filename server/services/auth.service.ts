@@ -1,5 +1,6 @@
 import { UserRepository } from "../db/user.repository";
-import { SelectUser, UserRole } from "../schema/user";
+import { SelectUser } from "../schema/user";
+import { UserRole } from "../common/enums";
 import { createError } from "h3";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -39,7 +40,6 @@ export class AuthService {
         statusMessage: "Invalid credentials",
       });
     }
-    console.log(user);
 
     const isPasswordValid = await bcrypt.compare(
       credentials.password,
@@ -64,7 +64,6 @@ export class AuthService {
   async register(
     userData: Omit<SelectUser, "id" | "createdAt" | "updatedAt">
   ): Promise<AuthResponse> {
-    // Hash password
     const hashedPassword = await bcrypt.hash(userData.password, 10);
 
     const user = await this.userRepository.create({

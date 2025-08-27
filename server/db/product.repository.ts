@@ -3,7 +3,6 @@ import { eq } from "drizzle-orm";
 import { users, SelectUser } from "../schema/user";
 import { BaseRepository } from "./base.repository";
 
-// Define a user type without sensitive fields for product queries
 type UserForProduct = Pick<
   SelectUser,
   "id" | "name" | "email" | "role" | "createdAt" | "updatedAt"
@@ -19,7 +18,6 @@ export class ProductRepository extends BaseRepository {
   ): Promise<SelectProduct> {
     return this.executeQuery(async () => {
       const [result] = await this.db.insert(products).values(product);
-      // Fetch the created product to return the full object
       const [createdProduct] = await this.db
         .select()
         .from(products)

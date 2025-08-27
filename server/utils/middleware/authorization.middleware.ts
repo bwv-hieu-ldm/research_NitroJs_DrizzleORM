@@ -1,5 +1,5 @@
 import { createError, getRouterParam, H3Event } from "h3";
-import { UserRole } from "../../schema/user";
+import { UserRole } from "../../common/enums";
 import { AuthenticatedUser } from "./auth.middleware";
 
 export function requireRole(allowedRoles: UserRole[]) {
@@ -7,7 +7,7 @@ export function requireRole(allowedRoles: UserRole[]) {
     handler: (event: H3Event, user: AuthenticatedUser) => Promise<any>
   ) => {
     return async (event: H3Event, user: AuthenticatedUser) => {
-      if (!allowedRoles.includes(user.role)) {
+      if (!allowedRoles.includes(user.role as UserRole)) {
         throw createError({
           statusCode: 403,
           statusMessage: "Insufficient permissions",
@@ -21,22 +21,23 @@ export function requireRole(allowedRoles: UserRole[]) {
 export function requireAdmin(
   handler: (event: H3Event, user: AuthenticatedUser) => Promise<any>
 ) {
-  return requireRole(["admin"])(handler);
+  return requireRole([UserRole.ADMIN])(handler);
 }
 
 export function requireModerator(
   handler: (event: H3Event, user: AuthenticatedUser) => Promise<any>
 ) {
-  return requireRole(["admin", "moderator"])(handler);
+  return requireRole([UserRole.ADMIN, UserRole.MODERATOR])(handler);
 }
 
 export function requireUser(
   handler: (event: H3Event, user: AuthenticatedUser) => Promise<any>
 ) {
-  return requireRole(["admin", "moderator", "user"])(handler);
+  return requireRole([UserRole.ADMIN, UserRole.MODERATOR, UserRole.USER])(
+    handler
+  );
 }
 
-// Resource ownership check middleware
 export function requireOwnership<T>(
   resourceGetter: (id: number) => Promise<T | null>,
   resourceUserIdField: keyof T
@@ -65,9 +66,8 @@ export function requireOwnership<T>(
         });
       }
 
-      // Check if user owns the resource or is admin
       if (
-        user.role !== "admin" &&
+        user.role !== UserRole.ADMIN &&
         resource[resourceUserIdField] !== user.userId
       ) {
         throw createError({

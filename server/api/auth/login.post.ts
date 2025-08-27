@@ -11,7 +11,6 @@ export default defineEventHandler(async (event) => {
   try {
     const body = await readBody(event);
 
-    // Validate input
     const validatedData = await loginSchema.validate(body);
 
     const authService = new AuthService();

@@ -1,7 +1,6 @@
 import * as yup from "yup";
 import { VALIDATION_CONSTANTS } from "../common/constants";
 
-// User validation schemas
 export const createUserSchema = yup.object({
   name: yup
     .string()
@@ -53,7 +52,6 @@ export const userIdSchema = yup.object({
     .required("ID is required"),
 });
 
-// Product validation schemas
 export const createProductSchema = yup.object({
   name: yup
     .string()

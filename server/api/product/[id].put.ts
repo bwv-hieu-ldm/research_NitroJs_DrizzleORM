@@ -20,7 +20,6 @@ export default defineEventHandler(
       try {
         const body = await readBody(event);
 
-        // Validate input
         const validatedData = await updateProductSchema.validate(body);
 
         await ProductService.update(product.id, validatedData);

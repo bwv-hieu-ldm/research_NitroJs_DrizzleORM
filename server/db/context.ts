@@ -48,11 +48,8 @@ class DatabaseContext {
   }
 }
 
-// Export singleton instance
 export const dbContext = DatabaseContext.getInstance();
 
-// Export a function to get the database instance
 export const getDb = () => dbContext.getDb();
 
-// Export the context for direct access if needed
 export { DatabaseContext };

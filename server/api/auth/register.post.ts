@@ -1,19 +1,19 @@
 import { createError, defineEventHandler, readBody } from "h3";
 import { AuthService } from "../../services/auth.service";
 import { object, string } from "yup";
+import { UserRole, getAllUserRoles } from "../../common/enums";
 
 const registerSchema = object({
   name: string().min(2).max(255).required(),
   email: string().email().required(),
   password: string().min(6).required(),
-  role: string().oneOf(["user", "moderator", "admin"]).default("user"),
+  role: string().oneOf(getAllUserRoles()).default(UserRole.USER),
 });
 
 export default defineEventHandler(async (event) => {
   try {
     const body = await readBody(event);
 
-    // Validate input
     const validatedData = await registerSchema.validate(body);
 
     const authService = new AuthService();
