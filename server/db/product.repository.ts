@@ -1,22 +1,26 @@
-import { getDb } from "../db";
 import { products, InsertProduct, SelectProduct } from "../schema/product";
 import { eq } from "drizzle-orm";
 import { users, SelectUser } from "../schema/user";
 import { BaseRepository } from "./base.repository";
 
+// Define a user type without sensitive fields for product queries
+type UserForProduct = Pick<
+  SelectUser,
+  "id" | "name" | "email" | "role" | "createdAt" | "updatedAt"
+>;
+
 export type ProductWithUser = SelectProduct & {
-  user: SelectUser | null;
+  user: UserForProduct | null;
 };
 
 export class ProductRepository extends BaseRepository {
   async create(
-    product: Omit<InsertProduct, "id" | "createdAt">
+    product: Omit<InsertProduct, "id" | "createdAt" | "updatedAt">
   ): Promise<SelectProduct> {
     return this.executeQuery(async () => {
-      const db = getDb();
-      const [result] = await db.insert(products).values(product);
+      const [result] = await this.db.insert(products).values(product);
       // Fetch the created product to return the full object
-      const [createdProduct] = await db
+      const [createdProduct] = await this.db
         .select()
         .from(products)
         .where(eq(products.id, result.insertId))
@@ -27,8 +31,7 @@ export class ProductRepository extends BaseRepository {
 
   async findById(id: number): Promise<ProductWithUser[]> {
     return this.executeQuery(async () => {
-      const db = getDb();
-      const results = await db
+      const results = await this.db
         .select({
           id: products.id,
           name: products.name,
@@ -36,10 +39,12 @@ export class ProductRepository extends BaseRepository {
           price: products.price,
           userId: products.userId,
           createdAt: products.createdAt,
+          updatedAt: products.updatedAt,
           user: {
             id: users.id,
             name: users.name,
             email: users.email,
+            role: users.role,
             createdAt: users.createdAt,
             updatedAt: users.updatedAt,
           },
@@ -56,6 +61,7 @@ export class ProductRepository extends BaseRepository {
         price: result.price,
         userId: result.userId,
         createdAt: result.createdAt,
+        updatedAt: result.updatedAt,
         user: result.user,
       }));
     }, "find product by ID");
@@ -63,8 +69,7 @@ export class ProductRepository extends BaseRepository {
 
   async findAll(): Promise<ProductWithUser[]> {
     return this.executeQuery(async () => {
-      const db = getDb();
-      const results = await db
+      const results = await this.db
         .select({
           id: products.id,
           name: products.name,
@@ -72,10 +77,12 @@ export class ProductRepository extends BaseRepository {
           price: products.price,
           userId: products.userId,
           createdAt: products.createdAt,
+          updatedAt: products.updatedAt,
           user: {
             id: users.id,
             name: users.name,
             email: users.email,
+            role: users.role,
             createdAt: users.createdAt,
             updatedAt: users.updatedAt,
           },
@@ -90,6 +97,7 @@ export class ProductRepository extends BaseRepository {
         price: result.price,
         userId: result.userId,
         createdAt: result.createdAt,
+        updatedAt: result.updatedAt,
         user: result.user,
       }));
     }, "find all products");
@@ -97,8 +105,7 @@ export class ProductRepository extends BaseRepository {
 
   async findByUserId(userId: number): Promise<ProductWithUser[]> {
     return this.executeQuery(async () => {
-      const db = getDb();
-      const results = await db
+      const results = await this.db
         .select({
           id: products.id,
           name: products.name,
@@ -106,10 +113,12 @@ export class ProductRepository extends BaseRepository {
           price: products.price,
           userId: products.userId,
           createdAt: products.createdAt,
+          updatedAt: products.updatedAt,
           user: {
             id: users.id,
             name: users.name,
             email: users.email,
+            role: users.role,
             createdAt: users.createdAt,
             updatedAt: users.updatedAt,
           },
@@ -125,6 +134,7 @@ export class ProductRepository extends BaseRepository {
         price: result.price,
         userId: result.userId,
         createdAt: result.createdAt,
+        updatedAt: result.updatedAt,
         user: result.user,
       }));
     }, "find products by user ID");
@@ -132,15 +142,13 @@ export class ProductRepository extends BaseRepository {
 
   async update(id: number, product: Partial<InsertProduct>): Promise<void> {
     return this.executeQuery(async () => {
-      const db = getDb();
-      await db.update(products).set(product).where(eq(products.id, id));
+      await this.db.update(products).set(product).where(eq(products.id, id));
     }, "update product");
   }
 
   async delete(id: number): Promise<void> {
     return this.executeQuery(async () => {
-      const db = getDb();
-      await db.delete(products).where(eq(products.id, id));
+      await this.db.delete(products).where(eq(products.id, id));
     }, "delete product");
   }
 }

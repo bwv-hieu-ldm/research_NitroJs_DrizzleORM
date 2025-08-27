@@ -1,10 +1,44 @@
+import { createError, defineEventHandler, readBody } from "h3";
 import { ProductService } from "../../services/product.service";
-import { createProductSchema } from "../../validation/schemas";
-import { withValidation } from "../../utils/validation-wrapper";
+import { object, string } from "yup";
+import { requireAuth } from "../../utils/middleware/auth.middleware";
+import { requireUser } from "../../utils/middleware/authorization.middleware";
 
-export default withValidation(
-  { body: createProductSchema },
-  async (event, validatedData) => {
-    return await ProductService.create(validatedData.body);
-  }
+const createProductSchema = object({
+  name: string().min(2).max(255).required(),
+  description: string().optional(),
+  price: string().required(),
+});
+
+export default defineEventHandler(
+  requireAuth(
+    requireUser(async (event, user) => {
+      try {
+        const body = await readBody(event);
+
+        // Validate input
+        const validatedData = await createProductSchema.validate(body);
+
+        const result = await ProductService.create({
+          ...validatedData,
+          userId: user.userId,
+        });
+
+        return {
+          success: true,
+          data: result,
+        };
+      } catch (error: any) {
+        if (error.name === "ValidationError") {
+          throw createError({
+            statusCode: 400,
+            statusMessage: "Validation error",
+            message: error.message,
+          });
+        }
+
+        throw error;
+      }
+    })
+  )
 );

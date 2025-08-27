@@ -1,490 +1,161 @@
-# NitroJS + DrizzleORM API Server
+# Nitro.js + DrizzleORM Research Project
 
-A production-ready, scalable API server built with NitroJS and DrizzleORM, featuring comprehensive error handling, validation, and clean architecture patterns.
+A modern web application built with Nitro.js and DrizzleORM, featuring authentication, authorization, and a clean repository pattern.
 
-## 🏗️ Project Architecture
+## Features
 
-```
-research-NitroJs-DrizzleORM/
-├── server/                          # Server application code
-│   ├── api/                        # API endpoints and route handlers
-│   ├── common/                     # Shared utilities and constants
-│   ├── db/                         # Database layer and repositories
-│   ├── plugins/                    # Nitro server plugins
-│   ├── schema/                     # Database schemas and types
-│   ├── services/                   # Business logic layer
-│   ├── utils/                      # Utility functions and helpers
-│   └── validation/                 # Input validation schemas
-├── drizzle/                        # Database migration files
-├── drizzle.config.ts               # Drizzle ORM configuration
-├── nitro.config.ts                 # Nitro server configuration
-└── package.json                    # Project dependencies
-```
+- **Authentication & Authorization**: JWT-based authentication with role-based access control
+- **Clean Architecture**: Repository pattern with dependency injection
+- **Database Optimization**: Single database connection context
+- **Type Safety**: Full TypeScript support with DrizzleORM
+- **Validation**: Input validation using Yup schemas
+- **Security**: Password hashing with bcrypt
 
-## 📁 Folder Structure & Responsibilities
-
-### **`server/api/`** - API Endpoints
-
-**Purpose**: HTTP route handlers and endpoint definitions
-**Responsibilities**:
-
-- Define REST API endpoints (GET, POST, PUT, DELETE)
-- Handle HTTP requests and responses
-- Apply validation middleware
-- Call appropriate services
-- Return standardized responses
-
-**Example Structure**:
+## Project Structure
 
 ```
-api/
-├── product/
-│   ├── [id].delete.ts     # DELETE /api/product/:id
-│   ├── [id].get.ts        # GET /api/product/:id
-│   ├── [id].put.ts        # PUT /api/product/:id
-│   ├── add.post.ts         # POST /api/product/add
-│   ├── index.get.ts        # GET /api/product
-│   └── user.get.ts         # GET /api/product/user
-└── user/
-    ├── [id].delete.ts      # DELETE /api/user/:id
-    ├── [id].get.ts         # GET /api/user/:id
-    ├── [id].put.ts         # PUT /api/user/:id
-    ├── add.post.ts          # POST /api/user/add
-    └── index.get.ts         # GET /api/user
+server/
+├── api/                    # API endpoints
+│   ├── auth/              # Authentication endpoints
+│   │   ├── login.post.ts  # User login
+│   │   └── register.post.ts # User registration
+│   ├── product/           # Product management
+│   └── user/              # User management
+├── db/                    # Database layer
+│   ├── context.ts         # Database connection context
+│   ├── base.repository.ts # Base repository class
+│   ├── user.repository.ts # User data access
+│   └── product.repository.ts # Product data access
+├── schema/                # Database schemas
+│   ├── common.ts          # Common field definitions
+│   ├── user.ts            # User schema
+│   └── product.ts         # Product schema
+├── services/              # Business logic
+│   ├── auth.service.ts    # Authentication service
+│   ├── user.service.ts    # User business logic
+│   └── product.service.ts # Product business logic
+└── utils/middleware/      # Middleware
+    ├── auth.middleware.ts # Authentication middleware
+    └── authorization.middleware.ts # Authorization middleware
 ```
 
-### **`server/common/`** - Shared Resources
+## Database Schema
 
-**Purpose**: Centralized constants, error definitions, and response utilities
-**Responsibilities**:
+### Common Fields
 
-- Define HTTP status codes and error messages
-- Provide standardized response formatting
-- Centralize configuration constants
-- Export common utilities
+All tables include these common fields:
 
-**Key Files**:
+- `id`: Primary key (auto-increment)
+- `createdAt`: Creation timestamp
+- `updatedAt`: Last update timestamp
 
-- `constants.ts` - Application-wide constants
-- `error.ts` - Error creation utilities
-- `response.ts` - Response formatting helpers
-- `index.ts` - Clean export interface
+### Users Table
 
-### **`server/db/`** - Database Layer
+- `id`, `createdAt`, `updatedAt` (common fields)
+- `name`: User's full name
+- `email`: Unique email address
+- `password`: Hashed password
+- `role`: User role (user, moderator, admin)
 
-**Purpose**: Database connection management and data access
-**Responsibilities**:
+### Products Table
 
-- Manage database connections and pooling
-- Provide repository pattern implementation
-- Handle database errors gracefully
-- Ensure type-safe database operations
+- `id`, `createdAt`, `updatedAt` (common fields)
+- `name`: Product name
+- `description`: Product description
+- `price`: Product price
+- `userId`: Foreign key to users table
 
-**Key Components**:
+## Authentication & Authorization
 
-- `connection.ts` - Database connection manager
-- `base.repository.ts` - Base repository with error handling
-- `product.repository.ts` - Product-specific data operations
-- `user.repository.ts` - User-specific data operations
+### User Roles
 
-### **`server/plugins/`** - Server Plugins
+- **User**: Can create, read, update, and delete their own products
+- **Moderator**: Can manage all products and users
+- **Admin**: Full system access
 
-**Purpose**: Nitro server lifecycle management
-**Responsibilities**:
+### API Security
 
-- Initialize database connections
-- Set up global error handlers
-- Configure server middleware
-- Handle startup/shutdown procedures
+- All endpoints (except auth) require valid JWT token
+- Role-based access control on sensitive operations
+- Resource ownership validation for user-specific data
 
-### **`server/schema/`** - Data Models
+## Getting Started
 
-**Purpose**: Database schema definitions and TypeScript types
-**Responsibilities**:
+1. **Install Dependencies**
 
-- Define database table structures
-- Generate TypeScript types
-- Establish relationships between entities
-- Ensure data integrity constraints
+   ```bash
+   npm install
+   ```
 
-### **`server/services/`** - Business Logic
+2. **Environment Setup**
+   Create a `.env` file based on `db.example.env`:
 
-**Purpose**: Application business logic and orchestration
-**Responsibilities**:
+   ```env
+   MYSQL_HOST=localhost
+   MYSQL_USER=your_user
+   MYSQL_PASSWORD=your_password
+   MYSQL_DATABASE=your_database
+   JWT_SECRET=your_jwt_secret_key
+   JWT_EXPIRES_IN=24h
+   ```
 
-- Implement business rules
-- Coordinate between repositories
-- Handle complex operations
-- Provide clean API for controllers
+3. **Database Setup**
 
-### **`server/utils/`** - Utility Functions
+   ```bash
+   npm run generate  # Generate migrations
+   npm run migrate   # Apply migrations
+   ```
 
-**Purpose**: Reusable helper functions and middleware
-**Responsibilities**:
+4. **Development**
+   ```bash
+   npm run dev
+   ```
 
-- Provide validation wrappers
-- Handle common operations
-- Implement cross-cutting concerns
-- Ensure code reusability
+## API Endpoints
 
-### **`server/validation/`** - Input Validation
+### Authentication
 
-**Purpose**: Request data validation and sanitization
-**Responsibilities**:
+- `POST /api/auth/login` - User login
+- `POST /api/auth/register` - User registration
 
-- Define validation schemas
-- Ensure data integrity
-- Provide meaningful error messages
-- Prevent invalid data processing
-
-## 🔄 Request Flow & Response Handling
-
-### **Request Flow Diagram**
-
-```
-HTTP Request → Validation → Service → Repository → Database
-     ↓              ↓         ↓         ↓          ↓
-Response ← Format ← Service ← Repository ← Database Result
-```
+### Users (Admin only)
 
-### **1. Request Validation**
+- `GET /api/user` - List all users
+- `POST /api/user/add` - Create user
+- `GET /api/user/[id]` - Get user by ID
+- `PUT /api/user/[id]` - Update user
+- `DELETE /api/user/[id]` - Delete user
 
-All incoming requests are automatically validated using the `withValidation` wrapper:
-
-```typescript
-// Example: User creation endpoint
-export default withValidation(
-  { body: createUserSchema }, // Validate request body
-  async (event, validatedData) => {
-    const result = await UserService.create(validatedData.body);
-    return wrapResponse(result); // Standardize response
-  }
-);
-```
-
-### **2. Service Layer Processing**
-
-Business logic is handled in the service layer:
-
-```typescript
-export const UserService = {
-  create: async (data: CreateUserData) => {
-    // Business logic here
-    const user = await userRepo.create(data);
-    return user;
-  },
-};
-```
-
-### **3. Repository Data Access**
-
-Data operations are abstracted through repositories:
-
-```typescript
-export class UserRepository extends BaseRepository {
-  async create(user: CreateUserData): Promise<User> {
-    return this.executeQuery(async () => {
-      // Database operation with error handling
-      const result = await db.insert(users).values(user);
-      return this.findById(result.insertId);
-    }, "create user");
-  }
-}
-```
-
-## 📤 Response Formatting
-
-### **Success Response Format**
-
-```typescript
-// Standard success response
-{
-  "success": true,
-  "data": { ... },           // Actual response data
-  "message": "User created successfully"  // Optional message
-}
-
-// Usage in code
-return createSuccessResponse(user, "User created successfully");
-return wrapResponse(user);  // Shorthand for success response
-```
-
-### **Error Response Format**
-
-```typescript
-// Standard error response
-{
-  "success": false,
-  "error": "User already exists",
-  "statusCode": 409
-}
-
-// Usage in code
-throw CONFLICT_ERROR("User already exists");
-throw INTERNAL_SERVER_ERROR("Database connection failed");
-```
-
-### **Validation Error Format**
-
-```typescript
-{
-  "success": false,
-  "error": "Invalid request data",
-  "data": {
-    "message": "Invalid request data",
-    "errors": [
-      "Name must be at least 2 characters",
-      "Email must be a valid email format"
-    ]
-  }
-}
-```
-
-## 🛡️ Error Handling & Wrapper Patterns
-
-### **1. Base Repository Error Wrapper**
-
-The `BaseRepository` class provides automatic error handling for all database operations:
-
-```typescript
-export abstract class BaseRepository {
-  protected async executeQuery<T>(
-    queryFn: () => Promise<T>,
-    operation: string
-  ): Promise<T> {
-    try {
-      return await queryFn();
-    } catch (error) {
-      this.handleError(error, operation);
-    }
-  }
-
-  protected handleError(error: unknown, operation: string): never {
-    if (error instanceof H3Error) {
-      throw error; // Re-throw H3 errors
-    }
-
-    // Convert unknown errors to standardized format
-    throw INTERNAL_SERVER_ERROR(
-      `Failed to ${operation}: ${
-        error instanceof Error ? error.message : "Unknown error"
-      }`
-    );
-  }
-}
-```
-
-### **2. Validation Wrapper**
-
-The `withValidation` wrapper automatically handles validation errors:
-
-```typescript
-export function withValidation<T>(
-  validationSchemas: ValidationSchemas,
-  handler: ValidationHandler<T>
-) {
-  return defineEventHandler(async (event: H3Event) => {
-    try {
-      // Validate request data
-      const validatedData = await validateRequest(event, validationSchemas);
-
-      // Execute handler with validated data
-      return await handler(event, validatedData);
-    } catch (error) {
-      if (error instanceof yup.ValidationError) {
-        // Convert validation errors to standardized format
-        throw createError({
-          statusCode: HTTP_STATUS.BAD_REQUEST,
-          statusMessage: "Validation Error",
-          data: {
-            message: ERROR_MESSAGES.VALIDATION_ERROR,
-            errors: error.errors,
-          },
-        });
-      }
-      throw error; // Re-throw other errors
-    }
-  });
-}
-```
-
-### **3. Service Layer Error Handling**
-
-Services can implement custom error handling for business logic:
-
-```typescript
-export const UserService = {
-  create: async (data: CreateUserData) => {
-    try {
-      // Check if user already exists
-      const existingUser = await userRepo.findByEmail(data.email);
-      if (existingUser) {
-        throw CONFLICT_ERROR("User already exists");
-      }
-
-      // Create user
-      return await userRepo.create(data);
-    } catch (error) {
-      // Log error for debugging
-      console.error("User creation failed:", error);
-
-      // Re-throw known errors, wrap unknown ones
-      if (error instanceof H3Error) {
-        throw error;
-      }
-      throw INTERNAL_SERVER_ERROR("Failed to create user");
-    }
-  },
-};
-```
-
-## 🚀 Getting Started
-
-### **1. Environment Setup**
-
-```bash
-# Copy environment template
-cp db.example.env .env
-
-# Fill in your database credentials
-MYSQL_HOST=localhost
-MYSQL_USER=your_username
-MYSQL_PASSWORD=your_password
-MYSQL_DATABASE=your_database
-```
-
-### **2. Install Dependencies**
-
-```bash
-npm install
-```
-
-### **3. Run Development Server**
-
-```bash
-npm run dev
-```
-
-The server will start on `http://localhost:3000` with automatic database initialization.
-
-## 🔧 Configuration
-
-### **Database Configuration**
-
-```typescript
-// server/db/connection.ts
-const pool = mysql.createPool({
-  host: process.env.MYSQL_HOST,
-  user: process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD,
-  database: process.env.MYSQL_DATABASE,
-  connectionLimit: 10,
-  acquireTimeout: 60000,
-  timeout: 60000,
-});
-```
-
-### **Validation Constants**
-
-```typescript
-// server/common/constants.ts
-export const VALIDATION_CONSTANTS = {
-  MIN_NAME_LENGTH: 2,
-  MAX_NAME_LENGTH: 255,
-  MAX_EMAIL_LENGTH: 255,
-  MAX_PRICE_LENGTH: 20,
-} as const;
-```
-
-## 📊 API Endpoints
-
-### **Users**
-
-- `POST /api/user/add` - Create new user
-- `GET /api/user` - Get all users
-- `GET /api/user/:id` - Get user by ID
-- `PUT /api/user/:id` - Update user
-- `DELETE /api/user/:id` - Delete user
-
-### **Products**
-
-- `POST /api/product/add` - Create new product
-- `GET /api/product` - Get all products
-- `GET /api/product/:id` - Get product by ID
-- `PUT /api/product/:id` - Update product
-- `DELETE /api/product/:id` - Delete product
-- `GET /api/product/user` - Get products by user ID
-
-## 🧪 Testing
-
-```bash
-# Run tests
-npm test
-
-# Run tests with coverage
-npm run test:coverage
-
-# Run tests in watch mode
-npm run test:watch
-```
-
-## 📈 Performance Features
-
-- **Connection Pooling**: Efficient database connection management
-- **Query Optimization**: Explicit field selection for joins
-- **Error Boundaries**: Prevents cascading failures
-- **Type Safety**: Compile-time error detection
-- **Validation**: Early request validation
-
-## 🔒 Security Features
-
-- **Input Validation**: Comprehensive request sanitization
-- **Error Sanitization**: No sensitive information in error messages
-- **Type Safety**: Prevents injection attacks
-- **Rate Limiting**: Built-in request throttling (configurable)
-
-## 🚀 Production Deployment
-
-### **Environment Variables**
-
-```bash
-NODE_ENV=production
-MYSQL_HOST=production-db-host
-MYSQL_USER=production-user
-MYSQL_PASSWORD=production-password
-MYSQL_DATABASE=production-database
-```
-
-### **Build & Deploy**
-
-```bash
-# Build for production
-npm run build
-
-# Start production server
-npm start
-```
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests for new functionality
-5. Submit a pull request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🆘 Support
-
-For support and questions:
-
-- Create an issue in the repository
-- Check the documentation
-- Review the code examples
-
----
-
-**Built with ❤️ using NitroJS and DrizzleORM**
+### Products
+
+- `GET /api/product` - List all products
+- `POST /api/product/add` - Create product (authenticated)
+- `GET /api/product/[id]` - Get product by ID
+- `PUT /api/product/[id]` - Update product (owner or admin)
+- `DELETE /api/product/[id]` - Delete product (owner or admin)
+
+## Key Improvements Made
+
+1. **Centralized Database Context**: Single connection instance shared across repositories
+2. **Common Schema Fields**: Extracted shared fields into reusable definitions
+3. **Authentication System**: JWT-based authentication with bcrypt password hashing
+4. **Authorization Middleware**: Role-based access control and resource ownership validation
+5. **Clean Repository Pattern**: Dependency injection and consistent error handling
+6. **Type Safety**: Full TypeScript support throughout the application
+
+## Security Features
+
+- Password hashing with bcrypt
+- JWT token authentication
+- Role-based access control
+- Resource ownership validation
+- Input validation with Yup schemas
+- SQL injection protection via DrizzleORM
+
+## Development Notes
+
+- The application uses a singleton pattern for database connections
+- All repositories extend a base class for consistent error handling
+- Middleware is composable for flexible authorization rules
+- Database migrations are automatically generated and applied
+- Environment variables are used for sensitive configuration

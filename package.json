@@ -8,6 +8,8 @@
     "migrate": "npx drizzle-kit migrate"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/jsonwebtoken": "^9.0.6",
     "@types/node": "^24.3.0",
     "dotenv": "^17.2.1",
     "drizzle-kit": "^0.31.4",
@@ -15,7 +17,9 @@
     "nitropack": "^2.12.4"
   },
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "drizzle-orm": "^0.44.4",
+    "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.14.3",
     "yup": "^1.7.0"
   }

@@ -1,17 +1,11 @@
 import { createError, H3Error } from "h3";
-import { INTERNAL_SERVER_ERROR } from "../common/error";
+import { DatabaseContext } from "./context";
 
 export abstract class BaseRepository {
-  protected handleError(error: unknown, operation: string): never {
-    if (error instanceof H3Error) {
-      throw error;
-    }
+  protected db: ReturnType<typeof DatabaseContext.prototype.getDb>;
 
-    throw INTERNAL_SERVER_ERROR(
-      `Failed to ${operation}: ${
-        error instanceof Error ? error.message : "Unknown error"
-      }`
-    );
+  constructor() {
+    this.db = DatabaseContext.getInstance().getDb();
   }
 
   protected async executeQuery<T>(
@@ -21,7 +15,14 @@ export abstract class BaseRepository {
     try {
       return await queryFn();
     } catch (error) {
-      this.handleError(error, operation);
+      if (error instanceof H3Error) {
+        throw error;
+      }
+      throw createError({
+        statusCode: 500,
+        statusMessage: `Failed to ${operation}`,
+        message: error instanceof Error ? error.message : "Unknown error",
+      });
     }
   }
 }

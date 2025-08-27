@@ -1,13 +1,45 @@
 import { ProductService } from "../../services/product.service";
-import { productIdSchema, updateProductSchema } from "../../validation/schemas";
-import { withValidation } from "../../utils/validation-wrapper";
+import { object, string } from "yup";
+import { requireAuth } from "../../utils/middleware/auth.middleware";
+import { requireOwnership } from "../../utils/middleware/authorization.middleware";
+import { SelectProduct } from "../../schema/product";
+import { createError, defineEventHandler, readBody } from "h3";
 
-export default withValidation(
-  { params: productIdSchema, body: updateProductSchema },
-  async (event, validatedData) => {
-    return await ProductService.update(
-      validatedData.params.id,
-      validatedData.body
-    );
-  }
+const updateProductSchema = object({
+  name: string().min(2).max(255).optional(),
+  description: string().optional(),
+  price: string().optional(),
+});
+
+export default defineEventHandler(
+  requireAuth(
+    requireOwnership(async (id: number) => {
+      const product = await ProductService.getById(id);
+      return product[0] || null;
+    }, "userId")(async (event, user, product: SelectProduct) => {
+      try {
+        const body = await readBody(event);
+
+        // Validate input
+        const validatedData = await updateProductSchema.validate(body);
+
+        await ProductService.update(product.id, validatedData);
+
+        return {
+          success: true,
+          message: "Product updated successfully",
+        };
+      } catch (error: any) {
+        if (error.name === "ValidationError") {
+          throw createError({
+            statusCode: 400,
+            statusMessage: "Validation error",
+            message: error.message,
+          });
+        }
+
+        throw error;
+      }
+    })
+  )
 );
