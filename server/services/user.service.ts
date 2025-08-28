@@ -1,5 +1,5 @@
-import { UserRepository } from "db/user.repository";
-import { InsertUser } from "schema/user";
+import { InsertUser } from "../schema/user";
+import { UserRepository } from "../repo/user.repository";
 
 const userRepo = new UserRepository();
 

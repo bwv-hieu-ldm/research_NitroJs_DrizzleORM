@@ -1,12 +1,12 @@
 import { defineNitroPlugin } from "nitropack/runtime/plugin";
-import { setupDatabase } from "../db";
+import { dbContext } from "../db/context";
 
 export default defineNitroPlugin(async () => {
   try {
-    await setupDatabase();
-    console.log("Database connection initialized successfully");
+    await dbContext.initialize();
+    console.log("Database connection established successfully");
   } catch (error) {
-    console.error("Failed to initialize database connection:", error);
-    throw error;
+    console.error("Failed to establish database connection:", error);
+    process.exit(1);
   }
 });

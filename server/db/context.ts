@@ -1,19 +1,19 @@
 import { drizzle } from "drizzle-orm/mysql2";
-import mysql from "mysql2/promise";
+import * as mysql from "mysql2/promise";
 import { DB_CONSTANTS, ERROR_MESSAGES } from "../common/constants";
 
-class DatabaseConnection {
-  private static instance: DatabaseConnection;
+class DatabaseContext {
+  private static instance: DatabaseContext;
   private pool: mysql.Pool | null = null;
   private db: ReturnType<typeof drizzle> | null = null;
 
   private constructor() {}
 
-  public static getInstance(): DatabaseConnection {
-    if (!DatabaseConnection.instance) {
-      DatabaseConnection.instance = new DatabaseConnection();
+  public static getInstance(): DatabaseContext {
+    if (!DatabaseContext.instance) {
+      DatabaseContext.instance = new DatabaseContext();
     }
-    return DatabaseConnection.instance;
+    return DatabaseContext.instance;
   }
 
   public async initialize(): Promise<void> {
@@ -48,5 +48,8 @@ class DatabaseConnection {
   }
 }
 
-export const dbConnection = DatabaseConnection.getInstance();
-export const getDb = () => dbConnection.getDb();
+export const dbContext = DatabaseContext.getInstance();
+
+export const getDb = () => dbContext.getDb();
+
+export { DatabaseContext };
